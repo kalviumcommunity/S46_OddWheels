@@ -1,0 +1,11 @@
+{
+  "name": "s46_oddwheels",
+  "version": "1.0.0",
+  "description": "OddWheels is a full stack project dedicated to showcasing a collection of weird and unconventional cars from around the world. Whether you're a car enthusiast with a taste for the peculiar or simply intrigued by automotive oddities, OddWheels has something for everyone.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC"
+}
