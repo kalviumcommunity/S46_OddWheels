@@ -35,5 +35,3 @@ deploy link: https://oddwheels.onrender.com
 Have questions or suggestions? Feel free to contact the project maintainer:
 
 - Email: sabariokg@gmail.com
-
-Thank you for checking out OddWheels!
