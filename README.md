@@ -28,7 +28,7 @@ To run OddWheels locally, follow these steps:
 5. In the `backend` directory, run `npm start` to start the backend server.
 6. In the `frontend` directory, run `npm start` to start the frontend server.
 
-deploy link: https://oddwheels.onrender.com .
+deploy link: https://oddwheels.onrender.com , https://oddwheels.pages.dev
 
 ## Contact
 
