@@ -8,7 +8,7 @@ const cors = require("cors");
 // define the ping route with the response in JSON
 
 app.use("/api", routes);
-app.use("/api/DB", MDrouter);
+app.use("/api", MDrouter);
 
 app.use(cors());
 app.use(express.json());

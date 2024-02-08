@@ -2,7 +2,8 @@ const mongoose = require("mongoose");
 require("dotenv").config();
 const express = require("express");
 const MDrouter = express.Router();
-const Usermodel = require("./module/user");
+const UserModel = require("./module/user");
+const Carmodel = require("./module/image");
 
 const startDatabase = async () => {
   try {
@@ -26,12 +27,14 @@ const isConnected = () => {
   return mongoose.connection.readyState === 1;
 };
 
-MDrouter.get("/users", (req, res) => {
-  Usermodel.find()
-    .then((users) => res.json(users))
-    .catch((error) => res.json(error.message));
+MDrouter.get("/user", async (req, res) => {
+  const data = await UserModel.find({});
+  res.status(200).json(data);
 });
 
-MDrouter.get("/Images", (req, res) => {});
+MDrouter.get("/image", async (req, res) => {
+  const data = await Carmodel.find();
+  res.status(200).json(data);
+});
 
 module.exports = { startDatabase, stopDatabase, isConnected, MDrouter };
