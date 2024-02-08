@@ -1,6 +1,7 @@
 const mongoose = require("mongoose");
 require("dotenv").config();
 const MDrouter = express.Router();
+const Usermodel = require("./module/user");
 
 const startDatabase = async () => {
   try {
@@ -25,7 +26,9 @@ const isConnected = () => {
 };
 
 MDrouter.get("/users", (req, res) => {
-  res;
+  Usermodel.find()
+    .then((users) => res.json(users))
+    .catch((error) => res.json(error.message));
 });
 
 MDrouter.get("/Images", (req, res) => {});
