@@ -1,22 +1,24 @@
-import React from "react";
-import carData from "../carsData.json";
+import React, { useEffect } from "react";
+import axios from "axios";
 
 export const DisplayList = () => {
+  const [data, setData] = useState(null);
+
+  useEffect(() => {
+    axios
+      .get("https://till-usually-1338.codedamn.app/doors")
+      .then((res) => {
+        setData(res.data);
+      })
+      .catch((error) => {
+        console.error("Error fetching data:", error);
+      });
+  }, []);
   return (
     <>
-      {carData.map((data) => (
-        <div
-          key={data._id}
-          className="flex flex-col justify-center items-center"
-        >
-          <p>{data._id}</p>
-          <img
-            src={data.images}
-            alt={`Car ${data._id}`}
-            className="h-auto w-10/12"
-          />
-        </div>
-      ))}
+      {data.map((dataset, index) => {
+        return <div key={index}>{dataset.image}</div>;
+      })}
     </>
   );
 };

@@ -1,5 +1,7 @@
 const mongoose = require("mongoose");
 require("dotenv").config();
+const MDrouter = express.Router();
+
 const startDatabase = async () => {
   try {
     await mongoose.connect(process.env.MONGO_URI);
@@ -22,4 +24,10 @@ const isConnected = () => {
   return mongoose.connection.readyState === 1;
 };
 
-module.exports = { startDatabase, stopDatabase, isConnected };
+MDrouter.get("/users", (req, res) => {
+  res;
+});
+
+MDrouter.get("/Images", (req, res) => {});
+
+module.exports = { startDatabase, stopDatabase, isConnected, MDrouter };
