@@ -7,11 +7,11 @@ const routes = require("./routes");
 const cors = require("cors");
 // define the ping route with the response in JSON
 
+app.use(express.json());
+app.use(cors());
+
 app.use("/api", routes);
 app.use("/api", MDrouter);
-
-app.use(cors());
-app.use(express.json());
 app.get("/ping", (req, res) => {
   res.send({ message: "pong" });
 });

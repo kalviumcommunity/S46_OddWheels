@@ -1,23 +1,40 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import axios from "axios";
 
 export const DisplayList = () => {
-  const [data, setData] = useState(null);
+  const [data, setData] = useState([]);
 
   useEffect(() => {
-    axios
-      .get("https://till-usually-1338.codedamn.app/doors")
-      .then((res) => {
-        setData(res.data);
-      })
-      .catch((error) => {
+    const fetchData = async () => {
+      try {
+        const response = await axios.get("http://localhost:3000/api/image");
+        setData(response.data);
+      } catch (error) {
         console.error("Error fetching data:", error);
-      });
+      }
+    };
+
+    fetchData();
   }, []);
+
   return (
     <>
       {data.map((dataset, index) => {
-        return <div key={index}>{dataset.image}</div>;
+        return (
+          <div key={index}>
+            <div
+              key={dataset._id}
+              className="flex flex-col justify-center items-center"
+            >
+              <p>{dataset._id}</p>
+              <img
+                src={dataset.images}
+                alt={`Car ${dataset._id}`}
+                className="h-auto w-10/12"
+              />
+            </div>
+          </div>
+        );
       })}
     </>
   );
