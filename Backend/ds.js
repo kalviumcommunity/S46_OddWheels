@@ -2,8 +2,7 @@ const mongoose = require("mongoose");
 require("dotenv").config();
 const express = require("express");
 const MDrouter = express.Router();
-const UserModel = require("./module/user");
-const Carmodel = require("./module/image");
+const { UserModel, Carmodel } = require("./module/MDSchema");
 
 const startDatabase = async () => {
   try {

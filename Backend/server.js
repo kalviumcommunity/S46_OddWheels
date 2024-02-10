@@ -11,7 +11,7 @@ app.use(express.json());
 app.use(cors());
 
 app.use("/api", routes);
-app.use("/api", MDrouter);
+app.use("/api/DB", MDrouter);
 app.get("/ping", (req, res) => {
   res.send({ message: "pong" });
 });
