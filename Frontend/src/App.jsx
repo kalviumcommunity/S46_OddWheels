@@ -1,5 +1,6 @@
 import "./App.css";
 import { DisplayList } from "./component/DisplayList";
+import { DisplayUpload } from "./component/DisplayUpload";
 import Upload from "./component/Upload";
 
 function App() {
@@ -7,6 +8,7 @@ function App() {
     <>
       {/* <DisplayList /> */}
       <Upload />
+      <DisplayUpload />
     </>
   );
 }

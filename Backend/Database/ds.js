@@ -72,6 +72,20 @@ MDrouter.get("/image", async (req, res) => {
   }
 });
 
+MDrouter.get("/uimages", async (req, res) => {
+  try {
+    // Retrieve all uploaded images
+    const images = await UploadModel.find({}, { _id: 0, file: 1 });
+
+    // Send the images as response
+    res.json(images);
+  } catch (error) {
+    // Handle error
+    console.error("❌ Error fetching images:", error.message);
+    res.status(500).send("Server Error");
+  }
+});
+
 // Route to handle file upload
 MDrouter.post("/upload", upload.single("file"), async (req, res) => {
   try {
