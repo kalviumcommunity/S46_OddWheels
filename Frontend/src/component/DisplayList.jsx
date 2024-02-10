@@ -7,7 +7,7 @@ export const DisplayList = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await axios.get("http://localhost:3000/api/image");
+        const response = await axios.get("http://localhost:3000/api/DB/image");
         setData(response.data);
       } catch (error) {
         console.error("Error fetching data:", error);

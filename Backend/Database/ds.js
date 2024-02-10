@@ -1,9 +1,18 @@
 // Importing required modules
 const mongoose = require("mongoose");
-require("dotenv").config(); // Loading environment variables from .env file
+const multer = require("multer");
 const express = require("express");
-const MDrouter = express.Router(); // Creating an instance of Express Router
-const { UserModel, Carmodel } = require("../module/MDSchema"); // Importing Mongoose models
+require("dotenv").config(); // Loading environment variables from .env file
+
+// Creating an instance of Express Router
+const MDrouter = express.Router();
+
+// Importing Mongoose models
+const { UserModel, Carmodel, UploadModel } = require("../modules/MDSchema");
+
+// Configuring multer storage
+const storage = multer.memoryStorage();
+const upload = multer({ storage: storage });
 
 // Function to start the database connection
 const startDatabase = async () => {
@@ -37,18 +46,63 @@ const isConnected = () => {
 
 // Route to get all users
 MDrouter.get("/user", async (req, res) => {
-  // Finding all documents in the UserModel collection
-  const data = await UserModel.find({});
-  // Sending the retrieved data as JSON response
-  res.status(200).json(data);
+  try {
+    // Finding all documents in the UserModel collection
+    const data = await UserModel.find({});
+    // Sending the retrieved data as JSON response
+    res.status(200).json(data);
+  } catch (error) {
+    // Handling error
+    console.error("❌ Error fetching users:", error.message);
+    res.status(500).send("Server Error");
+  }
 });
 
 // Route to get all images
 MDrouter.get("/image", async (req, res) => {
-  // Finding all documents in the Carmodel collection
-  const data = await Carmodel.find();
-  // Sending the retrieved data as JSON response
-  res.status(200).json(data);
+  try {
+    // Finding all documents in the Carmodel collection
+    const data = await Carmodel.find();
+    // Sending the retrieved data as JSON response
+    res.status(200).json(data);
+  } catch (error) {
+    // Handling error
+    console.error("❌ Error fetching images:", error.message);
+    res.status(500).send("Server Error");
+  }
+});
+
+// Route to handle file upload
+MDrouter.post("/upload", upload.single("file"), async (req, res) => {
+  try {
+    // Check if the request has an image
+    if (!req.file) {
+      res.json({
+        success: false,
+        message: "You must provide at least 1 file",
+      });
+    } else {
+      // Create an object for image upload
+      let imageUploadObject = {
+        file: {
+          data: req.file.buffer,
+          contentType: req.file.mimetype,
+        },
+      };
+      const uploadObject = new UploadModel(imageUploadObject);
+      // Save the object into the database
+      const uploadProcess = await uploadObject.save();
+      // Send success response
+      res.json({
+        success: true,
+        message: "File uploaded successfully",
+      });
+    }
+  } catch (error) {
+    // Handle error
+    console.error("❌ Error uploading file:", error.message);
+    res.status(500).send("Server Error");
+  }
 });
 
 // Exporting functions and router for use in other modules

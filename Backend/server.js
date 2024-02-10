@@ -12,11 +12,10 @@ const cors = require("cors");
 // Creating an instance of Express
 const app = express();
 const port = process.env.PUBLIC_PORT || 3000;
-
-// Middleware for parsing JSON bodies
-app.use(express.json());
 // Middleware for enabling CORS
 app.use(cors());
+// Middleware for parsing JSON bodies
+app.use(express.json());
 
 // Mounting routes
 app.use("/api", routes); // Mounting main API routes
