@@ -6,7 +6,7 @@ const {
   isConnected,
   MDrouter,
 } = require("./Database/ds");
-const routes = require("./routes");
+const routes = require("./routes/MainRoute");
 const cors = require("cors");
 
 // Creating an instance of Express
