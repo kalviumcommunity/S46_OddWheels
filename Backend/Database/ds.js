@@ -44,6 +44,21 @@ const isConnected = () => {
   return mongoose.connection.readyState === 1;
 };
 
+const validateEmail = async (email) => {
+  try {
+    // Check if there is a user with the provided email
+    const user = await UserModel.findOne({ email: email });
+    // If user exists, return true; otherwise, return false
+
+    return !!user;
+  } catch (error) {
+    // Handle error
+    console.error("❌ Error validating email:", error.message);
+    // Return false in case of error
+    return false;
+  }
+};
+
 // Route to get all users
 MDrouter.get("/user", async (req, res) => {
   try {
@@ -120,4 +135,10 @@ MDrouter.post("/upload", upload.single("file"), async (req, res) => {
 });
 
 // Exporting functions and router for use in other modules
-module.exports = { startDatabase, stopDatabase, isConnected, MDrouter };
+module.exports = {
+  startDatabase,
+  stopDatabase,
+  isConnected,
+  validateEmail,
+  MDrouter,
+};

@@ -83,9 +83,19 @@ export const Signup = () => {
     data.append("lastName", formData.lastName);
     data.append("location", formData.location);
     data.append("profileImage", formData.profileImage); // Ensure consistency with Multer configuration
-
+    console.log(data.email);
     try {
-      // Make API call to server for signup
+      // Check if email already exists
+      const emailExists = await axios.post(
+        "http://localhost:3000/api/auth/checkemail",
+        { email: formData.email },
+      );
+      console.log(emailExists);
+      if (emailExists.data.emailExists) {
+        setErrors({ ...errors, email: "Email already exists" });
+        return;
+      }
+
       const response = await axios.post(
         "http://localhost:3000/api/auth/signup",
         data,

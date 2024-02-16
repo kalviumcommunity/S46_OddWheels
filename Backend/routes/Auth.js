@@ -2,6 +2,7 @@
 const express = require("express"); // Express framework for handling routes
 const Joi = require("joi"); // Joi for validation
 const multer = require("multer"); // Multer for handling file uploads
+const { validateEmail } = require("../Database/ds");
 
 const { UserModel } = require("../modules/MDSchema"); // Importing Mongoose UserModel
 
@@ -34,6 +35,17 @@ Auth.get("/test", (req, res) => {
   res.status(200).send("GET request succeeded");
 });
 
+// Route for checkemail endpoint, handels email validation
+Auth.post("/checkemail", async (req, res) => {
+  // Validating email
+  const emailExists = await validateEmail(req.body.email);
+  if (emailExists) {
+    return res.status(200).json({ emailExists: true });
+  } else {
+    return res.status(200).json({ emailExists: false });
+  }
+});
+
 // Route for signup endpoint, handles file upload
 Auth.post("/signup", upload.single("profileImage"), async (req, res) => {
   try {
@@ -50,6 +62,7 @@ Auth.post("/signup", upload.single("profileImage"), async (req, res) => {
     // Destructuring required data from request body
     const { username, password, email, firstName, lastName, location } =
       req.body;
+    // Check if email already exists
 
     // Constructing user data object
     const userData = {
@@ -61,7 +74,7 @@ Auth.post("/signup", upload.single("profileImage"), async (req, res) => {
       location,
       profileImage: { data: req.file.buffer, contentType: req.file.mimetype },
     };
-    console.log(userData);
+    // console.log(userData);
 
     // Saving user data to database
     const newUser = new UserModel(userData);
