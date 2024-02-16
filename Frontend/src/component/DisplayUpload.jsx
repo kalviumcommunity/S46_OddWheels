@@ -24,7 +24,7 @@ export const DisplayUpload = () => {
         <div key={index}>
           <img
             src={`data:${image.file.contentType};base64,${Buffer.from(
-              image.file.data
+              image.file.data,
             ).toString("base64")}`}
             alt="Uploaded"
           />

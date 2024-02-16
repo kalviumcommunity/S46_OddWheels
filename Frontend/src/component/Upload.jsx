@@ -28,7 +28,7 @@ function Upload() {
           headers: {
             "Content-Type": "multipart/form-data",
           },
-        }
+        },
       );
 
       // Handle response
