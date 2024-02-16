@@ -59,6 +59,8 @@ export const Signup = () => {
     }
     if (!formData.password) {
       newErrors.password = "Password, please";
+    } else if (formData.password.length < 8 || formData.password.length > 13) {
+      newErrors.password = "Password, should be between 8 and 13 characters";
     }
     if (!formData.location) {
       newErrors.location = "Location, please";
