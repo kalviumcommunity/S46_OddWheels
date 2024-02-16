@@ -14,12 +14,20 @@ export const Signup = () => {
     profileImage: null,
   });
 
+  // State to manage field validation
+  const [errors, setErrors] = useState({});
+
   // Handle change in input fields
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData({
       ...formData,
       [name]: value,
+    });
+    // Clear error message when user starts typing
+    setErrors({
+      ...errors,
+      [name]: "",
     });
   };
 
@@ -34,9 +42,34 @@ export const Signup = () => {
   // Handle form submission
   const handleSubmit = async (e) => {
     e.preventDefault();
-    // Check if profile image is provided
+    const newErrors = {};
+
+    // Validate form fields
+    if (!formData.firstName) {
+      newErrors.firstName = "First name, please.";
+    }
+    if (!formData.lastName) {
+      newErrors.lastName = "Last name, please";
+    }
+    if (!formData.username) {
+      newErrors.username = "Username, please";
+    }
+    if (!formData.email) {
+      newErrors.email = "Email address, please";
+    }
+    if (!formData.password) {
+      newErrors.password = "Password, please";
+    }
+    if (!formData.location) {
+      newErrors.location = "Location, please";
+    }
     if (!formData.profileImage) {
-      return console.log("You must provide at least 1 file");
+      newErrors.profileImage = "Profile picture, please";
+    }
+
+    if (Object.keys(newErrors).length > 0) {
+      setErrors(newErrors);
+      return; // Don't submit if there are validation errors
     }
 
     // Create FormData object to send to the server
@@ -88,6 +121,9 @@ export const Signup = () => {
                 className="bg-gray-50ring-0 relative block w-11/12 rounded-lg border-2 border-neutral-300 p-2.5  text-sm text-neutral-900 placeholder-violet-700 outline-none placeholder:opacity-60 checked:bg-emerald-500 hover:border-violet-500 focus:border-violet-500 focus:ring-violet-500"
                 placeholder="First Name"
               />
+              {errors.firstName && (
+                <p className="text-sm text-red-500">{errors.firstName}</p>
+              )}
             </div>
             <div className="mb-4 w-11/12">
               <input
@@ -99,6 +135,9 @@ export const Signup = () => {
                 className="bg-gray-50ring-0 relative block w-full rounded-lg border-2 border-neutral-300 p-2.5 text-sm text-neutral-900  placeholder-violet-700 outline-none placeholder:opacity-60 checked:bg-emerald-500 hover:border-violet-500 focus:border-violet-500 focus:ring-violet-500 "
                 placeholder="Last Name"
               />
+              {errors.lastName && (
+                <p className="text-sm text-red-500">{errors.lastName}</p>
+              )}
             </div>
           </div>
 
@@ -112,6 +151,9 @@ export const Signup = () => {
               className="bg-gray-50ring-0 relative block w-full rounded-lg border-2 border-neutral-300 p-2.5 text-sm text-neutral-900  placeholder-violet-700 outline-none placeholder:opacity-60 checked:bg-emerald-500 hover:border-violet-500 focus:border-violet-500 focus:ring-violet-500"
               placeholder="Username"
             />
+            {errors.username && (
+              <p className="text-sm text-red-500">{errors.username}</p>
+            )}
           </div>
           <div className="mb-4">
             <input
@@ -123,6 +165,9 @@ export const Signup = () => {
               className="bg-gray-50ring-0 relative block w-full rounded-lg border-2 border-neutral-300 p-2.5 text-sm text-neutral-900  placeholder-violet-700 outline-none placeholder:opacity-60 checked:bg-emerald-500 hover:border-violet-500 focus:border-violet-500 focus:ring-violet-500"
               placeholder="Email Address"
             />
+            {errors.email && (
+              <p className="text-sm text-red-500">{errors.email}</p>
+            )}
           </div>
           <div className="mb-4">
             <input
@@ -134,6 +179,9 @@ export const Signup = () => {
               className="bg-gray-50ring-0 relative block w-full rounded-lg border-2 border-neutral-300 p-2.5 text-sm text-neutral-900  placeholder-violet-700 outline-none placeholder:opacity-60 checked:bg-emerald-500 hover:border-violet-500 focus:border-violet-500 focus:ring-violet-500"
               placeholder="Password"
             />
+            {errors.password && (
+              <p className="text-sm text-red-500">{errors.password}</p>
+            )}
           </div>
 
           <div className="mb-4">
@@ -146,6 +194,9 @@ export const Signup = () => {
               className="bg-gray-50ring-0 relative block w-full rounded-lg border-2 border-neutral-300 p-2.5 text-sm text-neutral-900  placeholder-violet-700 outline-none placeholder:opacity-60 checked:bg-emerald-500 hover:border-violet-500 focus:border-violet-500 focus:ring-violet-500"
               placeholder="Location"
             />
+            {errors.location && (
+              <p className="text-sm text-red-500">{errors.location}</p>
+            )}
           </div>
 
           <div className="grid w-full  items-center gap-1.5">
@@ -159,6 +210,9 @@ export const Signup = () => {
               type="file"
               className="border-input flex h-10 w-full rounded-md border border-neutral-300 bg-white px-3 py-2 text-sm text-gray-400 file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-gray-600 hover:border-violet-500 hover:bg-pallet1"
             />
+            {errors.profileImage && (
+              <p className="text-sm text-red-500">{errors.profileImage}</p>
+            )}
           </div>
           <div className="pt-8 text-center">
             <button
