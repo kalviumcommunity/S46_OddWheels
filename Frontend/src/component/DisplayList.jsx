@@ -24,7 +24,7 @@ export const DisplayList = () => {
           <div key={index}>
             <div
               key={dataset._id}
-              className="flex flex-col justify-center items-center"
+              className="flex flex-col items-center justify-center"
             >
               <p>{dataset._id}</p>
               <img
