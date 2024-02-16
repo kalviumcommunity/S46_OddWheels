@@ -43,7 +43,7 @@ export const Signup = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     const newErrors = {};
-
+    setErrors(newErrors);
     // Validate form fields
     if (!formData.firstName) {
       newErrors.firstName = "First name, please.";
@@ -90,7 +90,7 @@ export const Signup = () => {
         "http://localhost:3000/api/auth/checkemail",
         { email: formData.email },
       );
-      console.log(emailExists);
+      // console.log(emailExists);
       if (emailExists.data.emailExists) {
         setErrors({ ...errors, email: "Email already exists" });
         return;
@@ -106,6 +106,16 @@ export const Signup = () => {
         },
       );
       console.log(response.data);
+
+      if (response.data.signup) {
+        console.log(response.data.message);
+      } else {
+        const value = response.data.message[0];
+        console.log(value.field);
+        setErrors({ ...errors, [value.field]: value.error });
+      }
+
+      console.log(response.data);
     } catch (error) {
       console.error("Error during signup:", error);
     }
@@ -114,7 +124,7 @@ export const Signup = () => {
   // Render the Signup component
   return (
     <div
-      className="flex h-screen items-center justify-end bg-cover bg-center p-24"
+      className="flex h-screen items-center bg-cover bg-center p-24"
       style={{ backgroundImage: `url(${backgroundImage})` }}
     >
       <div className="mx-auto mt-8 max-w-md rounded-xl bg-white p-12">

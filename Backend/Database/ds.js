@@ -59,6 +59,7 @@ const validateEmail = async (email) => {
   }
 };
 
+const validatePassword = async (password) => {};
 // Route to get all users
 MDrouter.get("/user", async (req, res) => {
   try {
