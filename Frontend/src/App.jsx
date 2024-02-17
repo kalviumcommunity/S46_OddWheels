@@ -13,8 +13,8 @@ function App() {
       {/* <Upload /> */}
       {/* <DisplayUpload /> */}
       {/* <Login /> */}
-      <Signup />
-      {/* <Signin /> */}
+      {/* <Signup /> */}
+      <Signin />
     </>
   );
 }

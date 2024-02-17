@@ -4,7 +4,7 @@ const Joi = require("joi"); // Joi for validation
 const { joiPasswordExtendCore } = require("joi-password");
 const joiPassword = Joi.extend(joiPasswordExtendCore);
 const multer = require("multer"); // Multer for handling file uploads
-const { validateEmail } = require("../Database/ds");
+const { validateEmail, validatePassword } = require("../Database/ds");
 const bcrypt = require("bcrypt");
 
 const { UserModel } = require("../modules/MDSchema"); // Importing Mongoose UserModel
@@ -73,9 +73,18 @@ Auth.post("/checkemail", async (req, res) => {
 // Route for signin endpoint
 Auth.post("/signin", async (req, res) => {
   try {
-    // Sign in logic will be implemented here
-  } catch (e) {
-    console.log(e);
+    const passwordStatus = await validatePassword(
+      req.body.password,
+      req.body.email,
+    );
+    if (passwordStatus) {
+      res.status(200).json({ message: "Welcome" });
+    } else {
+      res.status(200).json({ message: "Email/Password not matching" });
+    }
+  } catch (error) {
+    console.error("Error during signin:", error);
+    res.status(500).json({ success: false, message: "Internal server error" });
   }
 });
 
@@ -100,9 +109,10 @@ Auth.post("/signup", upload.single("profileImage"), async (req, res) => {
     // Destructuring required data from request body
     const { username, password, email, firstName, lastName, location } =
       req.body;
-
+    // generate salt to hash password
+    const salt = "qwertyuiopasdfghjklzxcvbnm";
     // Hashing the password
-    const hashedPassword = await bcrypt.hash(password, 10);
+    const hashedPassword = await bcrypt.hash(password, salt);
 
     // Constructing user data object
     const userData = {

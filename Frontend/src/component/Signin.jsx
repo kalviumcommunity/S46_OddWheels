@@ -43,21 +43,20 @@ export const Signin = () => {
         { email: credentials.email },
       );
       console.log(emailExists);
-      if (emailExists.data.emailExists) {
-        setErrors({ ...errors, email: "Email already exists" });
+      if (!emailExists.data.emailExists) {
+        setErrors({ ...errors, email: "Email doesn't exists" });
         return;
       }
 
       const response = await axios.post(
-        "http://localhost:3000/api/auth/signup",
+        "http://localhost:3000/api/auth/signin",
         { email: credentials.email, password: credentials.password },
-        {
-          headers: {
-            "Content-Type": "application/json",
-          },
-        },
       );
       console.log(response.data);
+      if (emailExists.data.message) {
+        setErrors({ ...errors, email: "Email already exists" });
+        return;
+      }
     } catch (error) {
       console.error("Error during signup:", error);
     }

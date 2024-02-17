@@ -3,6 +3,7 @@ const mongoose = require("mongoose");
 const multer = require("multer");
 const express = require("express");
 require("dotenv").config(); // Loading environment variables from .env file
+const bcrypt = require("bcrypt");
 
 // Creating an instance of Express Router
 const MDrouter = express.Router();
@@ -59,7 +60,23 @@ const validateEmail = async (email) => {
   }
 };
 
-const validatePassword = async (password) => {};
+const validatePassword = async (pass, email) => {
+  try {
+    // Check if there is a user with the provided email
+    const user = await UserModel.findOne({ email: email });
+    console.log(user);
+    // Use bcrypt's compare function to compare the plain password with the hashed password
+    const match = await bcrypt.compare(pass, user.password);
+
+    // Return true if the password matches the hashed password, false otherwise
+    return match;
+  } catch (error) {
+    console.error(error);
+    // Handle any errors gracefully
+    return false;
+  }
+};
+
 // Route to get all users
 MDrouter.get("/user", async (req, res) => {
   try {
@@ -141,5 +158,6 @@ module.exports = {
   stopDatabase,
   isConnected,
   validateEmail,
+  validatePassword,
   MDrouter,
 };
