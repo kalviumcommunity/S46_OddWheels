@@ -6,6 +6,7 @@ const joiPassword = Joi.extend(joiPasswordExtendCore);
 const multer = require("multer"); // Multer for handling file uploads
 const { validateEmail, validatePassword } = require("../Database/ds");
 const bcrypt = require("bcrypt");
+const jwt = require('jsonwebtoken')
 
 const { UserModel } = require("../modules/MDSchema"); // Importing Mongoose UserModel
 
@@ -54,6 +55,9 @@ function validateUserInput(input) {
   return SignupSchema.validate(input);
 }
 
+function generateAccessToken(user) {
+  return jwt.sign(user, process.env.ACCESS_TOKEN)
+}
 // Route for testing endpoint
 Auth.get("/test", (req, res) => {
   res.status(200).send("GET request succeeded");
@@ -78,7 +82,9 @@ Auth.post("/signin", async (req, res) => {
       req.body.email,
     );
     if (passwordStatus) {
-      res.status(200).json({ vaildate: true, message: "Welcome" });
+      const accessToken = generateAccessToken(req.body.email)
+      const refreshToken = jwt.sign(req.body.email, process.env.REFRESH_TOKEN)
+      res.status(200).json({ vaildate: true, message: "Welcome",accessToken: accessToken, refreshToken: refreshToken });
     } else {
       res
         .status(200)
