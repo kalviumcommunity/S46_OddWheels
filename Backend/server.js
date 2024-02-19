@@ -19,7 +19,7 @@ app.use(express.json());
 
 // Mounting routes
 app.use("/api", routes); // Mounting main API routes
-app.use("/api/DB", MDrouter); // Mounting routes related to database operations
+// app.use("/api/DB", MDrouter); // Mounting routes related to database operations
 
 // Handling a GET request to /ping endpoint
 app.get("/ping", (req, res) => {

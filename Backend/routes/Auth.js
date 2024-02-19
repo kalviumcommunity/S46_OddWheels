@@ -1,14 +1,13 @@
 // Importing required modules
 const express = require("express"); // Express framework for handling routes
-const Joi = require("joi"); // Joi for validation
+const { validateEmail, validatePassword } = require("../Database/Vaildation");
 const { joiPasswordExtendCore } = require("joi-password");
-const joiPassword = Joi.extend(joiPasswordExtendCore);
 const multer = require("multer"); // Multer for handling file uploads
-const { validateEmail, validatePassword } = require("../Database/ds");
+const Joi = require("joi"); // Joi for validation
+const joiPassword = Joi.extend(joiPasswordExtendCore);
 const bcrypt = require("bcrypt");
-const jwt = require('jsonwebtoken')
 
-const { UserModel } = require("../modules/MDSchema"); // Importing Mongoose UserModel
+const { UserModel } = require("../Database/Schema"); // Importing Mongoose UserModel
 
 // Creating a router instance
 const Auth = express.Router();
@@ -55,14 +54,6 @@ function validateUserInput(input) {
   return SignupSchema.validate(input);
 }
 
-function generateAccessToken(user) {
-  return jwt.sign(user, process.env.ACCESS_TOKEN)
-}
-// Route for testing endpoint
-Auth.get("/test", (req, res) => {
-  res.status(200).send("GET request succeeded");
-});
-
 // Route for checkemail endpoint, handels email validation
 Auth.post("/checkemail", async (req, res) => {
   // Validating email
@@ -81,10 +72,8 @@ Auth.post("/signin", async (req, res) => {
       req.body.password,
       req.body.email,
     );
-    if (passwordStatus) {
-      const accessToken = generateAccessToken(req.body.email)
-      const refreshToken = jwt.sign(req.body.email, process.env.REFRESH_TOKEN)
-      res.status(200).json({ vaildate: true, message: "Welcome",accessToken: accessToken, refreshToken: refreshToken });
+    if (passwordStatus.match) {
+      res.status(200).json({ vaildate: true, message: "Welcome",accessToken: passwordStatus.accessToken, refreshToken: passwordStatus.refreshToken });
     } else {
       res
         .status(200)
@@ -113,16 +102,13 @@ Auth.post("/signup", upload.single("profileImage"), async (req, res) => {
         message: errors,
       });
     }
-
     // Destructuring required data from request body
     const { username, password, email, firstName, lastName, location } =
       req.body;
-
     // generate salt to hash password
     const salt = await bcrypt.genSalt(10);
     // Hashing the password
     const hashedPassword = await bcrypt.hash(password, salt);
-
     // Constructing user data object
     const userData = {
       username,
@@ -133,11 +119,9 @@ Auth.post("/signup", upload.single("profileImage"), async (req, res) => {
       location,
       profileImage: { data: req.file.buffer, contentType: req.file.mimetype },
     };
-
     // Saving user data to database
     const newUser = new UserModel(userData);
     await newUser.save();
-
     // Sending success response
     res.status(201).json({
       signup: true,
