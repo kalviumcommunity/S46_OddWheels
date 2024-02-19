@@ -7,7 +7,7 @@ export const DisplayList = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await axios.get("http://localhost:3000/api/image");
+        const response = await axios.get("http://localhost:3000/api/DB/image");
         setData(response.data);
       } catch (error) {
         console.error("Error fetching data:", error);
@@ -24,7 +24,7 @@ export const DisplayList = () => {
           <div key={index}>
             <div
               key={dataset._id}
-              className="flex flex-col justify-center items-center"
+              className="flex flex-col items-center justify-center"
             >
               <p>{dataset._id}</p>
               <img
