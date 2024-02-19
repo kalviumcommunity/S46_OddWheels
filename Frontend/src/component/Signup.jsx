@@ -1,10 +1,8 @@
 import React, { useState } from "react";
 import backgroundImage from "../../src/Public/loginBackGround.svg";
-import { useNavigate } from "react-router-dom";
 import axios from "axios";
 
 export const Signup = () => {
-  const navigate = useNavigate();
   // State to manage form data
   const [formData, setFormData] = useState({
     username: "",
@@ -111,7 +109,6 @@ export const Signup = () => {
 
       if (response.data.signup) {
         console.log(response.data.message);
-        navigate("/singin");
       } else {
         const value = response.data.message[0];
         console.log(value.field);

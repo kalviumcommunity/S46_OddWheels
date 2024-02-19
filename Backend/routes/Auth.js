@@ -78,11 +78,9 @@ Auth.post("/signin", async (req, res) => {
       req.body.email,
     );
     if (passwordStatus) {
-      res.status(200).json({ vaildate: true, message: "Welcome" });
+      res.status(200).json({ message: "Welcome" });
     } else {
-      res
-        .status(200)
-        .json({ vaildate: false, message: "Email/Password not matching" });
+      res.status(200).json({ message: "Email/Password not matching" });
     }
   } catch (error) {
     console.error("Error during signin:", error);
@@ -111,9 +109,8 @@ Auth.post("/signup", upload.single("profileImage"), async (req, res) => {
     // Destructuring required data from request body
     const { username, password, email, firstName, lastName, location } =
       req.body;
-
     // generate salt to hash password
-    const salt = await bcrypt.genSalt(10);
+    const salt = "qwertyuiopasdfghjklzxcvbnm";
     // Hashing the password
     const hashedPassword = await bcrypt.hash(password, salt);
 

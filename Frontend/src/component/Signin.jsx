@@ -21,7 +21,6 @@ export const Signin = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setErrors({});
     const newErrors = {};
 
     // Validate form fields
@@ -54,8 +53,8 @@ export const Signin = () => {
         { email: credentials.email, password: credentials.password },
       );
       console.log(response.data);
-      if (!response.data.vaildate) {
-        setErrors({ ...errors, heading: "Email/Password not matching" });
+      if (emailExists.data.message) {
+        setErrors({ ...errors, email: "Email already exists" });
         return;
       }
     } catch (error) {
@@ -72,9 +71,6 @@ export const Signin = () => {
         <h2 className="mb-4 text-center text-2xl font-bold text-violet-700">
           Sign In
         </h2>
-        {errors.heading && (
-          <p className="pb-2 text-sm text-red-500">{errors.heading}</p>
-        )}
         <form onSubmit={handleSubmit}>
           <div className="mb-4">
             <input
@@ -109,7 +105,7 @@ export const Signin = () => {
               type="submit"
               className=" rounded border-2 border-neutral-300 px-4 py-2 text-violet-700 hover:bg-black hover:bg-violet-700 hover:text-white"
             >
-              Sign In
+              Sign Up
             </button>
           </div>
         </form>
