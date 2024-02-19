@@ -3,6 +3,7 @@ const mongoose = require("mongoose");
 const multer = require("multer");
 const express = require("express");
 require("dotenv").config(); // Loading environment variables from .env file
+const bcrypt = require("bcrypt");
 
 // Creating an instance of Express Router
 const MDrouter = express.Router();
@@ -42,6 +43,38 @@ const stopDatabase = async () => {
 const isConnected = () => {
   // Checking if the connection state is equal to 1 (connected)
   return mongoose.connection.readyState === 1;
+};
+
+const validateEmail = async (email) => {
+  try {
+    // Check if there is a user with the provided email
+    const user = await UserModel.findOne({ email: email });
+    // If user exists, return true; otherwise, return false
+
+    return !!user;
+  } catch (error) {
+    // Handle error
+    console.error("❌ Error validating email:", error.message);
+    // Return false in case of error
+    return false;
+  }
+};
+
+const validatePassword = async (pass, email) => {
+  try {
+    // Check if there is a user with the provided email
+    const user = await UserModel.findOne({ email: email });
+    console.log(user);
+    // Use bcrypt's compare function to compare the plain password with the hashed password
+    const match = await bcrypt.compare(pass, user.password);
+
+    // Return true if the password matches the hashed password, false otherwise
+    return match;
+  } catch (error) {
+    console.error(error);
+    // Handle any errors gracefully
+    return false;
+  }
 };
 
 // Route to get all users
@@ -120,4 +153,11 @@ MDrouter.post("/upload", upload.single("file"), async (req, res) => {
 });
 
 // Exporting functions and router for use in other modules
-module.exports = { startDatabase, stopDatabase, isConnected, MDrouter };
+module.exports = {
+  startDatabase,
+  stopDatabase,
+  isConnected,
+  validateEmail,
+  validatePassword,
+  MDrouter,
+};

@@ -1,7 +1,11 @@
 // Importing required modules
 const express = require("express"); // Express framework for handling routes
 const Joi = require("joi"); // Joi for validation
+const { joiPasswordExtendCore } = require("joi-password");
+const joiPassword = Joi.extend(joiPasswordExtendCore);
 const multer = require("multer"); // Multer for handling file uploads
+const { validateEmail, validatePassword } = require("../Database/ds");
+const bcrypt = require("bcrypt");
 
 const { UserModel } = require("../modules/MDSchema"); // Importing Mongoose UserModel
 
@@ -16,8 +20,29 @@ const upload = multer({ storage: storage });
 function validateUserInput(input) {
   // Defining Joi schema for user input
   const SignupSchema = Joi.object({
-    username: Joi.string().min(4).max(15).required(), // Username validation
-    password: Joi.string().min(4).max(15).required(), // Password validation
+    username: Joi.string().min(4).max(15).required().messages({
+      "string.min": "Username should have a minimum length of {#limit}",
+      "string.max": "Username should have a maximum length of {#limit}",
+      "any.required": "Username is required",
+    }), // Username validation
+    password: joiPassword
+      .string()
+      .minOfSpecialCharacters(1)
+      .minOfLowercase(1)
+      .minOfUppercase(1)
+      .minOfNumeric(1)
+      .noWhiteSpaces()
+      .messages({
+        "password.minOfUppercase":
+          "{#label} should contain at least {#min} uppercase character",
+        "password.minOfSpecialCharacters":
+          "{#label} should contain at least {#min} special character",
+        "password.minOfLowercase":
+          "{#label} should contain at least {#min} lowercase character",
+        "password.minOfNumeric":
+          "{#label} should contain at least {#min} numeric character",
+        "password.noWhiteSpaces": "{#label} should not contain white spaces",
+      }), // Password validation
     email: Joi.string().email().required(), // Email validation
     firstName: Joi.string().required(), // First name validation
     lastName: Joi.string().required(), // Last name validation
@@ -34,43 +59,82 @@ Auth.get("/test", (req, res) => {
   res.status(200).send("GET request succeeded");
 });
 
+// Route for checkemail endpoint, handels email validation
+Auth.post("/checkemail", async (req, res) => {
+  // Validating email
+  const emailExists = await validateEmail(req.body.email);
+  if (emailExists) {
+    return res.status(200).json({ emailExists: true });
+  } else {
+    return res.status(200).json({ emailExists: false });
+  }
+});
+
+// Route for signin endpoint
+Auth.post("/signin", async (req, res) => {
+  try {
+    const passwordStatus = await validatePassword(
+      req.body.password,
+      req.body.email,
+    );
+    if (passwordStatus) {
+      res.status(200).json({ message: "Welcome" });
+    } else {
+      res.status(200).json({ message: "Email/Password not matching" });
+    }
+  } catch (error) {
+    console.error("Error during signin:", error);
+    res.status(500).json({ success: false, message: "Internal server error" });
+  }
+});
+
 // Route for signup endpoint, handles file upload
 Auth.post("/signup", upload.single("profileImage"), async (req, res) => {
   try {
     // Validating user input
     const validationResult = validateUserInput(req.body);
     if (validationResult.error) {
-      // If validation fails, return error response
-      return res.status(400).json({
+      // If validation fails, return error response with field name
+      const errors = validationResult.error.details.map((detail) => ({
+        field: detail.context.label,
+        error: detail.message,
+      }));
+      return res.status(200).json({
+        signup: false,
         success: false,
-        message: validationResult.error.details[0].message,
+        message: errors,
       });
     }
 
     // Destructuring required data from request body
     const { username, password, email, firstName, lastName, location } =
       req.body;
+    // generate salt to hash password
+    const salt = "qwertyuiopasdfghjklzxcvbnm";
+    // Hashing the password
+    const hashedPassword = await bcrypt.hash(password, salt);
 
     // Constructing user data object
     const userData = {
       username,
-      password,
+      password: hashedPassword,
       email,
       firstName,
       lastName,
       location,
       profileImage: { data: req.file.buffer, contentType: req.file.mimetype },
     };
-    console.log(userData);
 
     // Saving user data to database
     const newUser = new UserModel(userData);
     await newUser.save();
 
     // Sending success response
-    res
-      .status(201)
-      .json({ success: true, message: "User signed up successfully" });
+    res.status(201).json({
+      signup: true,
+      success: true,
+      message: "User signed up successfully",
+    });
   } catch (error) {
     // Handling errors
     console.error("Error during signup:", error);

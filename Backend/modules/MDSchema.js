@@ -19,7 +19,7 @@ const UserSchema = new mongoose.Schema({
     data: Buffer,
     contentType: String,
   }, // Profile image of the user
-  post:Array, // Array of post ids
+  post: Array, // Array of post ids
 });
 
 // Defining schema for Upload
@@ -43,4 +43,3 @@ const UploadModel = mongoose.model("uploads", UploadSchema);
 
 // Exporting UserModel and Carmodel for use in other modules
 module.exports = { UserModel, Carmodel, UploadModel };
-

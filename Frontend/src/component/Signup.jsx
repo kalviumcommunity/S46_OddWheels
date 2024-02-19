@@ -43,7 +43,7 @@ export const Signup = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     const newErrors = {};
-
+    setErrors(newErrors);
     // Validate form fields
     if (!formData.firstName) {
       newErrors.firstName = "First name, please.";
@@ -59,6 +59,8 @@ export const Signup = () => {
     }
     if (!formData.password) {
       newErrors.password = "Password, please";
+    } else if (formData.password.length < 8 || formData.password.length > 13) {
+      newErrors.password = "Password, should be between 8 and 13 characters";
     }
     if (!formData.location) {
       newErrors.location = "Location, please";
@@ -81,9 +83,19 @@ export const Signup = () => {
     data.append("lastName", formData.lastName);
     data.append("location", formData.location);
     data.append("profileImage", formData.profileImage); // Ensure consistency with Multer configuration
-
+    console.log(data.email);
     try {
-      // Make API call to server for signup
+      // Check if email already exists
+      const emailExists = await axios.post(
+        "http://localhost:3000/api/auth/checkemail",
+        { email: formData.email },
+      );
+      // console.log(emailExists);
+      if (emailExists.data.emailExists) {
+        setErrors({ ...errors, email: "Email already exists" });
+        return;
+      }
+
       const response = await axios.post(
         "http://localhost:3000/api/auth/signup",
         data,
@@ -94,6 +106,16 @@ export const Signup = () => {
         },
       );
       console.log(response.data);
+
+      if (response.data.signup) {
+        console.log(response.data.message);
+      } else {
+        const value = response.data.message[0];
+        console.log(value.field);
+        setErrors({ ...errors, [value.field]: value.error });
+      }
+
+      console.log(response.data);
     } catch (error) {
       console.error("Error during signup:", error);
     }
@@ -102,7 +124,7 @@ export const Signup = () => {
   // Render the Signup component
   return (
     <div
-      className="flex h-screen items-center justify-end bg-cover bg-center p-24"
+      className="flex h-screen items-center bg-cover bg-center p-24"
       style={{ backgroundImage: `url(${backgroundImage})` }}
     >
       <div className="mx-auto mt-8 max-w-md rounded-xl bg-white p-12">
