@@ -38,24 +38,14 @@ export const Signin = () => {
     }
 
     try {
-      // Check if email already exists
-      const emailExists = await axios.post(
-        "http://localhost:3000/api/auth/checkemail",
-        { email: credentials.email },
-      );
-      console.log(emailExists);
-      if (!emailExists.data.emailExists) {
-        setErrors({ ...errors, email: "Email doesn't exists" });
-        return;
-      }
-
       const response = await axios.post(
         "http://localhost:3000/api/auth/signin",
         { email: credentials.email, password: credentials.password },
+        { withCredentials: true }, // Enable sending cookies
       );
       console.log(response.data);
-      if (!response.data.vaildate) {
-        setErrors({ ...errors, heading: "Email/Password not matching" });
+      if (!response.data.validate) {
+        setErrors({ ...errors, heading: response.data.message });
         return;
       }
     } catch (error) {

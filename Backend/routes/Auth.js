@@ -1,6 +1,10 @@
 // Importing required modules
 const express = require("express"); // Express framework for handling routes
-const { validateEmail, validatePassword } = require("../Database/Vaildation");
+const {
+  validateEmail,
+  validateLogin,
+  generateAccessToken,
+} = require("../Database/Vaildation");
 const { joiPasswordExtendCore } = require("joi-password");
 const multer = require("multer"); // Multer for handling file uploads
 const Joi = require("joi"); // Joi for validation
@@ -68,16 +72,21 @@ Auth.post("/checkemail", async (req, res) => {
 // Route for signin endpoint
 Auth.post("/signin", async (req, res) => {
   try {
-    const passwordStatus = await validatePassword(
-      req.body.password,
-      req.body.email,
-    );
-    if (passwordStatus.match) {
-      res.status(200).json({ vaildate: true, message: "Welcome",accessToken: passwordStatus.accessToken, refreshToken: passwordStatus.refreshToken });
+    const loginStatus = await validateLogin(req.body.password, req.body.email);
+    if (loginStatus.match) {
+      res.cookie("token", loginStatus.accessToken, {
+        withCredentials: true,
+        httpOnly: false,
+      });
+      res.status(200).json({
+        validate: true, // Corrected spelling of validate
+        message: "Welcome",
+        accessToken: loginStatus.accessToken, // Corrected spelling of accessToken
+      });
     } else {
       res
         .status(200)
-        .json({ vaildate: false, message: "Email/Password not matching" });
+        .json({ validate: false, message: "Email/Password not matching" });
     }
   } catch (error) {
     console.error("Error during signin:", error);
@@ -122,6 +131,14 @@ Auth.post("/signup", upload.single("profileImage"), async (req, res) => {
     // Saving user data to database
     const newUser = new UserModel(userData);
     await newUser.save();
+
+    // Generating JWT token
+    const token = generateAccessToken(user._id);
+    // Sending cookie to Frontend
+    res.cookie("token", token, {
+      withCredentials: true,
+      httpOnly: false,
+    });
     // Sending success response
     res.status(201).json({
       signup: true,
