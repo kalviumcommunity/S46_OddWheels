@@ -3,7 +3,6 @@
 OddWheels is a full stack project dedicated to showcasing a collection of weird and unconventional cars from around the world. Whether you're a car enthusiast with a taste for the peculiar or simply intrigued by automotive oddities, OddWheels has something for everyone.
 
 ## Features
-
 - Browse a curated list of weird cars with detailed information and images.
 - Search for specific cars by name, year, make, or category.
 - Submit your own weird car findings to contribute to the collection.
