@@ -51,13 +51,9 @@ const tokenVerification = async (token) => {
     const user = await UserModel.findById(data.id);
 
     if (user) {
-      return {
-        verification: true,
-        user: user.username,
-        message: "Welcome",
-      };
+      return true;
     } else {
-      return { verification: false };
+      return false;
     }
   } catch (err) {
     console.error("Error occurred during token verification:", err);

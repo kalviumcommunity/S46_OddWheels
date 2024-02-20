@@ -52,6 +52,7 @@ function validateUserInput(input) {
     firstName: Joi.string().required(), // First name validation
     lastName: Joi.string().required(), // Last name validation
     location: Joi.string().min(4).max(15).required(), // Location validation
+    bio: Joi.string().min(4).max(1000).required(), // Location validation
     // profileImage: Joi.string().uri().required(), // Uncomment if using URI for profile image
   });
 
@@ -114,7 +115,7 @@ Auth.post("/signup", upload.single("profileImage"), async (req, res) => {
       });
     }
     // Destructuring required data from request body
-    const { username, password, email, firstName, lastName, location } =
+    const { username, password, email, firstName, lastName, location, bio } =
       req.body;
     // generate salt to hash password
     const salt = await bcrypt.genSalt(10);
@@ -128,6 +129,7 @@ Auth.post("/signup", upload.single("profileImage"), async (req, res) => {
       firstName,
       lastName,
       location,
+      bio,
       profileImage: { data: req.file.buffer, contentType: req.file.mimetype },
     };
     // Saving user data to database
@@ -135,7 +137,7 @@ Auth.post("/signup", upload.single("profileImage"), async (req, res) => {
     await newUser.save();
 
     // Generating JWT token
-    const token = generateAccessToken(user._id);
+    const token = generateAccessToken(newUser._id);
     // Sending cookie to Frontend
     res.cookie("token", token, {
       maxAge: 1000 * 60 * 60 * 24 * 30,

@@ -7,6 +7,10 @@ export default {
       colors: {
         pallet1: "#0D2100",
       },
+      height: {
+        "7/100": "7%",
+        "91/100": "91%",
+      },
     },
   },
 

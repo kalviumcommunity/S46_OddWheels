@@ -15,6 +15,7 @@ const UserSchema = new mongoose.Schema({
   firstName: String, // First name of the user
   lastName: String, // Last name of the user
   location: String, // Location of the user
+  bio: String,
   profileImage: {
     data: Buffer,
     contentType: String,
