@@ -4,6 +4,7 @@ const {
   validateEmail,
   validateLogin,
   generateAccessToken,
+  tokenVerification,
 } = require("../Database/Vaildation");
 const { joiPasswordExtendCore } = require("joi-password");
 const multer = require("multer"); // Multer for handling file uploads
@@ -73,6 +74,7 @@ Auth.post("/checkemail", async (req, res) => {
 Auth.post("/signin", async (req, res) => {
   try {
     const loginStatus = await validateLogin(req.body.password, req.body.email);
+    // console.log(loginStatus);
     if (loginStatus.match) {
       res.cookie("token", loginStatus.accessToken, {
         withCredentials: true,
@@ -136,6 +138,7 @@ Auth.post("/signup", upload.single("profileImage"), async (req, res) => {
     const token = generateAccessToken(user._id);
     // Sending cookie to Frontend
     res.cookie("token", token, {
+      maxAge: 1000 * 60 * 60 * 24 * 30,
       withCredentials: true,
       httpOnly: false,
     });
@@ -152,5 +155,20 @@ Auth.post("/signup", upload.single("profileImage"), async (req, res) => {
   }
 });
 
+Auth.post("/home", async (req, res) => {
+  const token = req.cookies.token;
+
+  // console.log("token", token);
+  if (!token) {
+    return res.json({ verification: false, message: "Invalid token" });
+  }
+  const tokenVerifier = await tokenVerification(token, res);
+  // console.log("verified data", tokenVerifier);
+  if (tokenVerifier) {
+    return res.status(200).json(tokenVerifier);
+  } else {
+    return res.status(200).json(tokenVerifier);
+  }
+});
 // Exporting the router for use in other modules
 module.exports = Auth;

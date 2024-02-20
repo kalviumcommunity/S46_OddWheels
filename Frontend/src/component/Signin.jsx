@@ -1,8 +1,10 @@
 import React, { useState } from "react";
 import backgroundImage from "../../src/Public/loginBackGround.svg";
+import { useNavigate } from "react-router-dom";
 import axios from "axios";
 
 export const Signin = () => {
+  const navigate = useNavigate();
   const [credentials, setCredentials] = useState({ email: "", password: "" });
   const [errors, setErrors] = useState({});
 
@@ -43,10 +45,11 @@ export const Signin = () => {
         { email: credentials.email, password: credentials.password },
         { withCredentials: true }, // Enable sending cookies
       );
-      console.log(response.data);
       if (!response.data.validate) {
         setErrors({ ...errors, heading: response.data.message });
         return;
+      } else {
+        navigate("/home");
       }
     } catch (error) {
       console.error("Error during signup:", error);

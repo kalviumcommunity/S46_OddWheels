@@ -28,18 +28,11 @@ const validateLogin = async (pass, email) => {
   try {
     // Check if there is a user with the provided email
     const user = await UserModel.findOne({ email: email });
-    console.log(user);
     // Use bcrypt's compare function to compare the plain password with the hashed password
     const match = await bcrypt.compare(pass, user.password);
     // const accessToken = generateAccessToken(email);
-
     // Generating JWT token
     const token = generateAccessToken(user._id);
-    // Sending cookie to Frontend
-    // res.cookie("token", token, {
-    //   withCredentials: true,
-    //   httpOnly: false,
-    // });
     // Return true if the password matches the hashed password, false otherwise
     return {
       match: match,
@@ -52,9 +45,30 @@ const validateLogin = async (pass, email) => {
   }
 };
 
+const tokenVerification = async (token) => {
+  try {
+    const data = await jwt.verify(token, process.env.ACCESS_TOKEN);
+    const user = await UserModel.findById(data.id);
+
+    if (user) {
+      return {
+        verification: true,
+        user: user.username,
+        message: "Welcome",
+      };
+    } else {
+      return { verification: false };
+    }
+  } catch (err) {
+    console.error("Error occurred during token verification:", err);
+    return { verification: false };
+  }
+};
+
 // Exporting functions and router for use in other modules
 module.exports = {
   validateEmail,
   validateLogin,
   generateAccessToken,
+  tokenVerification,
 };
