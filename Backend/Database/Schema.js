@@ -1,12 +1,6 @@
 // Importing mongoose module
 const mongoose = require("mongoose");
 
-// Defining schema for Car
-const CarSchema = new mongoose.Schema({
-  _id: Number, // Unique identifier for car
-  images: String, // String representing car images
-});
-
 // Defining schema for User
 const UserSchema = new mongoose.Schema({
   username: String, // Name of the user
@@ -15,6 +9,7 @@ const UserSchema = new mongoose.Schema({
   firstName: String, // First name of the user
   lastName: String, // Last name of the user
   location: String, // Location of the user
+  bio: String,
   profileImage: {
     data: Buffer,
     contentType: String,
@@ -22,22 +17,22 @@ const UserSchema = new mongoose.Schema({
   post: Array, // Array of post ids
 });
 
-// Defining schema for Upload
-const UploadSchema = new mongoose.Schema({
-  file: {
+// Defining schema for Post Data
+const PostSchema = new mongoose.Schema({
+  userID: String, // User
+  captions: String, // Name of the user
+  hashTag: String, // Email address of the user
+  postImage: {
     data: Buffer,
     contentType: String,
-  },
+  }, // Profile image of the user
 });
 
 // Creating UserModel using the UserSchema
 const UserModel = mongoose.model("users", UserSchema);
 
-// Creating Carmodel using the CarSchema
-const Carmodel = mongoose.model("images", CarSchema);
-
-// Creating UploadModel using the UploadSchema
-const UploadModel = mongoose.model("uploads", UploadSchema);
+// Creating UserModel using the UserSchema
+const PostModel = mongoose.model("posts", PostSchema);
 
 // Exporting UserModel and Carmodel for use in other modules
-module.exports = { UserModel, Carmodel, UploadModel };
+module.exports = { UserModel, PostModel };
