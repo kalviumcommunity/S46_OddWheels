@@ -30,8 +30,6 @@ const UploadSchema = new mongoose.Schema({
   },
 });
 
-// Defining schema for Image
-
 // Creating UserModel using the UserSchema
 const UserModel = mongoose.model("users", UserSchema);
 
