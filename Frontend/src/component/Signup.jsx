@@ -13,6 +13,7 @@ export const Signup = () => {
     firstName: "",
     lastName: "",
     location: "",
+    bio: "",
     profileImage: null,
   });
 
@@ -70,6 +71,9 @@ export const Signup = () => {
     if (!formData.profileImage) {
       newErrors.profileImage = "Profile picture, please";
     }
+    if (!formData.bio) {
+      newErrors.profileImage = "Bio, please";
+    }
 
     if (Object.keys(newErrors).length > 0) {
       setErrors(newErrors);
@@ -84,6 +88,7 @@ export const Signup = () => {
     data.append("firstName", formData.firstName);
     data.append("lastName", formData.lastName);
     data.append("location", formData.location);
+    data.append("bio", formData.bio);
     data.append("profileImage", formData.profileImage); // Ensure consistency with Multer configuration
     console.log(data.email);
     try {
@@ -111,7 +116,7 @@ export const Signup = () => {
 
       if (response.data.signup) {
         console.log(response.data.message);
-        navigate("/singin");
+        navigate("/login");
       } else {
         const value = response.data.message[0];
         console.log(value.field);
@@ -218,6 +223,21 @@ export const Signup = () => {
               onChange={handleChange}
               className="bg-gray-50ring-0 relative block w-full rounded-lg border-2 border-neutral-300 p-2.5 text-sm text-neutral-900  placeholder-violet-700 outline-none placeholder:opacity-60 checked:bg-emerald-500 hover:border-violet-500 focus:border-violet-500 focus:ring-violet-500"
               placeholder="Location"
+            />
+            {errors.location && (
+              <p className="text-sm text-red-500">{errors.location}</p>
+            )}
+          </div>
+
+          <div className="mb-4">
+            <textarea
+              type="text"
+              id="bio"
+              name="bio"
+              value={formData.bio}
+              onChange={handleChange}
+              className="bg-gray-50ring-0 relative block w-full rounded-lg border-2 border-neutral-300 p-2.5 text-sm text-neutral-900  placeholder-violet-700 outline-none placeholder:opacity-60 checked:bg-emerald-500 hover:border-violet-500 focus:border-violet-500 focus:ring-violet-500"
+              placeholder="Bio"
             />
             {errors.location && (
               <p className="text-sm text-red-500">{errors.location}</p>

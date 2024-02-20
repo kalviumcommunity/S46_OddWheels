@@ -1,25 +1,23 @@
 // Importing necessary modules and dependencies
 const express = require("express");
-const {
-  startDatabase,
-  stopDatabase,
-  isConnected,
-  MDrouter,
-} = require("./Database/ds");
+const { startDatabase, isConnected } = require("./Database/ds");
 const routes = require("./routes/MainRoute");
 const cors = require("cors");
+const cookieParser = require("cookie-parser");
 
 // Creating an instance of Express
 const app = express();
 const port = process.env.PUBLIC_PORT || 3000;
+app.use(cookieParser());
 // Middleware for enabling CORS
-app.use(cors());
+app.use(cors({ credentials: true, origin: true, withCredentials: true }));
+
 // Middleware for parsing JSON bodies
 app.use(express.json());
 
 // Mounting routes
 app.use("/api", routes); // Mounting main API routes
-app.use("/api/DB", MDrouter); // Mounting routes related to database operations
+// app.use("/api/DB", MDrouter); // Mounting routes related to database operations
 
 // Handling a GET request to /ping endpoint
 app.get("/ping", (req, res) => {

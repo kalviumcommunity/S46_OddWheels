@@ -1,13 +1,18 @@
 // Importing required modules
 const express = require("express"); // Express framework for handling routes
-const Joi = require("joi"); // Joi for validation
+const {
+  validateEmail,
+  validateLogin,
+  generateAccessToken,
+  tokenVerification,
+} = require("../Database/Vaildation");
 const { joiPasswordExtendCore } = require("joi-password");
-const joiPassword = Joi.extend(joiPasswordExtendCore);
 const multer = require("multer"); // Multer for handling file uploads
-const { validateEmail, validatePassword } = require("../Database/ds");
+const Joi = require("joi"); // Joi for validation
+const joiPassword = Joi.extend(joiPasswordExtendCore);
 const bcrypt = require("bcrypt");
 
-const { UserModel } = require("../modules/MDSchema"); // Importing Mongoose UserModel
+const { UserModel } = require("../Database/Schema"); // Importing Mongoose UserModel
 
 // Creating a router instance
 const Auth = express.Router();
@@ -47,17 +52,13 @@ function validateUserInput(input) {
     firstName: Joi.string().required(), // First name validation
     lastName: Joi.string().required(), // Last name validation
     location: Joi.string().min(4).max(15).required(), // Location validation
+    bio: Joi.string().min(4).max(1000).required(), // Location validation
     // profileImage: Joi.string().uri().required(), // Uncomment if using URI for profile image
   });
 
   // Validating input against the schema
   return SignupSchema.validate(input);
 }
-
-// Route for testing endpoint
-Auth.get("/test", (req, res) => {
-  res.status(200).send("GET request succeeded");
-});
 
 // Route for checkemail endpoint, handels email validation
 Auth.post("/checkemail", async (req, res) => {
@@ -73,16 +74,22 @@ Auth.post("/checkemail", async (req, res) => {
 // Route for signin endpoint
 Auth.post("/signin", async (req, res) => {
   try {
-    const passwordStatus = await validatePassword(
-      req.body.password,
-      req.body.email,
-    );
-    if (passwordStatus) {
-      res.status(200).json({ vaildate: true, message: "Welcome" });
+    const loginStatus = await validateLogin(req.body.password, req.body.email);
+    // console.log(loginStatus);
+    if (loginStatus.match) {
+      res.cookie("token", loginStatus.accessToken, {
+        withCredentials: true,
+        httpOnly: false,
+      });
+      res.status(200).json({
+        validate: true, // Corrected spelling of validate
+        message: "Welcome",
+        accessToken: loginStatus.accessToken, // Corrected spelling of accessToken
+      });
     } else {
       res
         .status(200)
-        .json({ vaildate: false, message: "Email/Password not matching" });
+        .json({ validate: false, message: "Email/Password not matching" });
     }
   } catch (error) {
     console.error("Error during signin:", error);
@@ -107,16 +114,13 @@ Auth.post("/signup", upload.single("profileImage"), async (req, res) => {
         message: errors,
       });
     }
-
     // Destructuring required data from request body
-    const { username, password, email, firstName, lastName, location } =
+    const { username, password, email, firstName, lastName, location, bio } =
       req.body;
-
     // generate salt to hash password
     const salt = await bcrypt.genSalt(10);
     // Hashing the password
     const hashedPassword = await bcrypt.hash(password, salt);
-
     // Constructing user data object
     const userData = {
       username,
@@ -125,13 +129,21 @@ Auth.post("/signup", upload.single("profileImage"), async (req, res) => {
       firstName,
       lastName,
       location,
+      bio,
       profileImage: { data: req.file.buffer, contentType: req.file.mimetype },
     };
-
     // Saving user data to database
     const newUser = new UserModel(userData);
     await newUser.save();
 
+    // Generating JWT token
+    const token = generateAccessToken(newUser._id);
+    // Sending cookie to Frontend
+    res.cookie("token", token, {
+      maxAge: 1000 * 60 * 60 * 24 * 30,
+      withCredentials: true,
+      httpOnly: false,
+    });
     // Sending success response
     res.status(201).json({
       signup: true,
@@ -145,5 +157,20 @@ Auth.post("/signup", upload.single("profileImage"), async (req, res) => {
   }
 });
 
+Auth.post("/home", async (req, res) => {
+  const token = req.cookies.token;
+
+  // console.log("token", token);
+  if (!token) {
+    return res.json({ verification: false, message: "Invalid token" });
+  }
+  const tokenVerifier = await tokenVerification(token, res);
+  // console.log("verified data", tokenVerifier);
+  if (tokenVerifier) {
+    return res.status(200).json(tokenVerifier);
+  } else {
+    return res.status(200).json(tokenVerifier);
+  }
+});
 // Exporting the router for use in other modules
 module.exports = Auth;
