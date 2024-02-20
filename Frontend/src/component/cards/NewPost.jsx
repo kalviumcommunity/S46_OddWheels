@@ -30,6 +30,7 @@ export const NewPost = ({ close }) => {
   };
   // Handle form submission
   const handleSubmit = async (e) => {
+    console.log("submit clicked");
     e.preventDefault();
     const newErrors = {};
     setErrors(newErrors);
@@ -57,15 +58,19 @@ export const NewPost = ({ close }) => {
 
     try {
       const response = await axios.post(
-        "http://localhost:3000/api/posts",
+        "http://localhost:3000/api/post/post",
         data,
         {
           headers: {
             "Content-Type": "multipart/form-data",
           },
+          withCredentials: true,
         },
       );
-      console.log(response.data);
+
+      if (response.data.success) {
+        close();
+      }
 
       // Handle response data accordingly
     } catch (error) {
@@ -81,7 +86,7 @@ export const NewPost = ({ close }) => {
 
   return (
     <div className="absolute left-1/2 top-1/2 flex w-96 -translate-x-1/2 -translate-y-1/2 rounded-xl bg-violet-700 bg-opacity-50 p-4 text-center">
-      <form action="" className="w-full">
+      <form className="w-full" onSubmit={handleSubmit}>
         <div className="mb-4">
           <textarea
             type="text"
@@ -133,7 +138,7 @@ export const NewPost = ({ close }) => {
           </div>
           <div>
             <button type="submit" className={buttonClass}>
-              Sign Up
+              Post
             </button>
           </div>
         </div>
