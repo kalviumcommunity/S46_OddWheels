@@ -9,8 +9,8 @@ import { Home } from "./component/Home";
 function App() {
   return (
     <Routes>
-      <Route path="/" element={<Signin />} />
-      <Route path="/login" element={<Login />} />
+      <Route path="/login" element={<Signin />} />
+      <Route path="/" element={<Login />} />
       <Route path="/signup" element={<Signup />} />
       <Route path="/home" element={<Home />} />
     </Routes>
