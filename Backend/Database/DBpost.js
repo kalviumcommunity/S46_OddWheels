@@ -1,7 +1,7 @@
 const jwt = require("jsonwebtoken");
-const { PostModel } = require("./Schema");
+const { PostModel, UserModel } = require("./Schema"); // Import UserModel
 require("dotenv").config();
-const { tokenVerification } = require("../Database/Vaildation");
+const { tokenVerification } = require("./Vaildation"); // Correct the path to Validation file
 
 const postingPost = async (token, req) => {
   try {
@@ -9,7 +9,14 @@ const postingPost = async (token, req) => {
     const verifiedToken = await tokenVerification(token);
     if (verifiedToken) {
       const data = jwt.verify(token, process.env.ACCESS_TOKEN);
-      // Extracting form fields
+
+      // Find user by ID
+      const user = await UserModel.findById(data.id);
+      if (!user) {
+        throw new Error("User not found");
+      }
+
+      // Extract form fields
       const { captions, hashTag } = req.body;
 
       // Create post data object
@@ -20,19 +27,22 @@ const postingPost = async (token, req) => {
         postImage: { data: req.file.buffer, contentType: req.file.mimetype },
       };
 
-      // Saving post data to database
+      // Save post data to database
       const newPost = new PostModel(postData);
       await newPost.save();
+
+      // Update user's posts
+      user.post.push(newPost.id);
+      await user.save();
 
       console.log("Post saved successfully");
     }
   } catch (error) {
-    console.error("Error posting post:", error);
+    console.error("Error posting post:", error.message);
     // Handle error appropriately, maybe return an error response
   }
 };
 
-// Exporting functions and router for use in other modules
 module.exports = {
   postingPost,
 };
