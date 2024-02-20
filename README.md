@@ -8,6 +8,7 @@ OddWheels is a full stack project dedicated to showcasing a collection of weird 
 - Submit your own weird car findings to contribute to the collection.
 - Like and share your favorite oddities with friends on social media.
 
+
 ## Technologies Used
 
 - **Frontend:** HTML, CSS, JavaScript (React)
