@@ -11,7 +11,7 @@ export const Profile = () => {
           "http://localhost:3000/api/fetch/profile",
           { withCredentials: true },
         );
-        console.log(response.data);
+        // console.log(response.data);
         setData(response.data);
       } catch (error) {
         console.log(error);
