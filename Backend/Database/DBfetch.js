@@ -14,14 +14,65 @@ const fetchingProfile = async (token) => {
   } catch {}
 };
 
+const fetchingUserPost = async (token) => {
+  try {
+    if (await tokenVerification(token)) {
+      const data = await jwt.verify(token, process.env.ACCESS_TOKEN);
+      const user = await UserModel.findById(data.id).select("post");
+
+      const postData = [];
+
+      // Sequentially fetch each post
+      for (const postId of user.post) {
+        const post = await PostModel.findById(postId);
+        if (post) {
+          postData.push(post);
+        } else {
+          console.log(`Post with ID ${postId} not found`);
+          const index = user.post.indexOf(postId);
+          if (index !== -1) {
+            user.post.splice(index, 1); // Remove post ID from user's post array
+          }
+        }
+      }
+
+      await user.save(); // Save changes to user's post array
+
+      // Log or do something with postData if needed
+      // console.log(postData);
+
+      return postData;
+    }
+  } catch (error) {
+    console.error("Error fetching user posts:", error.message);
+    throw error;
+  }
+};
+
 const fetchingPost = async (token) => {
   try {
     if (await tokenVerification(token)) {
-      const post = await PostModel.find({});
-      console.log(post[0].userId);
-      return post;
+      // Fetch all documents
+      const posts = await PostModel.find({});
+
+      // Shuffle the posts array randomly
+      const shuffledPosts = shuffleArray(posts);
+
+      return shuffledPosts;
     }
-  } catch {}
+  } catch (error) {
+    console.error("Error fetching posts:", error);
+    throw error;
+  }
+};
+
+// Function to shuffle an array randomly
+const shuffleArray = (array) => {
+  for (let i = array.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [array[i], array[j]] = [array[j], array[i]];
+  }
+  return array;
 };
 
 const fetchPostUser = async (token, id) => {
@@ -40,4 +91,5 @@ module.exports = {
   fetchingProfile,
   fetchingPost,
   fetchPostUser,
+  fetchingUserPost,
 };

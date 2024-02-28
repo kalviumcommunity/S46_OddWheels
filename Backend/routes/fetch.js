@@ -4,6 +4,7 @@ const {
   fetchingProfile,
   fetchingPost,
   fetchPostUser,
+  fetchingUserPost,
 } = require("../Database/DBfetch");
 
 Fetch.get("/profile", async (req, res) => {
@@ -12,6 +13,15 @@ Fetch.get("/profile", async (req, res) => {
     return res.json({ verification: false, message: "Invalid token" });
   }
   const data = await fetchingProfile(token);
+  res.status(200).json(data);
+});
+
+Fetch.get("/userpost", async (req, res) => {
+  const token = req.cookies.token;
+  if (!token) {
+    return res.json({ verification: false, message: "Invalid token" });
+  }
+  const data = await fetchingUserPost(token);
   res.status(200).json(data);
 });
 

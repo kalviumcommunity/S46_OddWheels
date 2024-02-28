@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { Buffer } from "buffer";
+import { Link } from "react-router-dom";
 
 export const Profile = () => {
   const [data, setData] = useState({});
@@ -36,7 +37,9 @@ export const Profile = () => {
             </div>
             <div className="pb-2 text-lg font-bold">
               <p>
-                {data.firstName} {data.lastName}
+                <Link to="/profile">
+                  {data.firstName} {data.lastName}
+                </Link>
               </p>
             </div>
             {/* <div className="pb-2 text-lg">{data.username}</div>

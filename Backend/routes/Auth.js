@@ -1,5 +1,6 @@
 // Importing required modules
 const express = require("express"); // Express framework for handling routes
+const sharp = require("sharp");
 const {
   validateEmail,
   validateLogin,
@@ -97,7 +98,6 @@ Auth.post("/signin", async (req, res) => {
   }
 });
 
-// Route for signup endpoint, handles file upload
 Auth.post("/signup", upload.single("profileImage"), async (req, res) => {
   try {
     // Validating user input
@@ -114,13 +114,22 @@ Auth.post("/signup", upload.single("profileImage"), async (req, res) => {
         message: errors,
       });
     }
+
     // Destructuring required data from request body
     const { username, password, email, firstName, lastName, location, bio } =
       req.body;
+
     // generate salt to hash password
     const salt = await bcrypt.genSalt(10);
+
     // Hashing the password
     const hashedPassword = await bcrypt.hash(password, salt);
+
+    // Process and reduce image quality using sharp
+    const processedImageBuffer = await sharp(req.file.buffer)
+      .jpeg({ quality: 50 }) // You can adjust the quality as per your requirement
+      .toBuffer();
+
     // Constructing user data object
     const userData = {
       username,
@@ -130,20 +139,26 @@ Auth.post("/signup", upload.single("profileImage"), async (req, res) => {
       lastName,
       location,
       bio,
-      profileImage: { data: req.file.buffer, contentType: req.file.mimetype },
+      profileImage: {
+        data: processedImageBuffer,
+        contentType: req.file.mimetype,
+      },
     };
+
     // Saving user data to database
     const newUser = new UserModel(userData);
     await newUser.save();
 
     // Generating JWT token
     const token = generateAccessToken(newUser._id);
+
     // Sending cookie to Frontend
     res.cookie("token", token, {
       maxAge: 1000 * 60 * 60 * 24 * 30,
       withCredentials: true,
       httpOnly: false,
     });
+
     // Sending success response
     res.status(201).json({
       signup: true,
