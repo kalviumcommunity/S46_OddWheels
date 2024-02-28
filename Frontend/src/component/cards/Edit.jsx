@@ -1,11 +1,10 @@
+import React, { useState } from "react";
 import axios from "axios";
-import React, { useEffect, useState } from "react";
 
-export const NewPost = ({ close }) => {
+export const Edit = ({ close, data, edit }) => {
   const [formData, setFormData] = useState({
-    captions: "",
-    hashTag: "",
-    postImage: null,
+    captions: data.captions || "",
+    hashTag: data.hashTag || "",
   });
 
   const [errors, setErrors] = useState({});
@@ -22,60 +21,45 @@ export const NewPost = ({ close }) => {
     });
   };
 
-  const handleImageChange = (e) => {
-    setFormData({
-      ...formData,
-      postImage: e.target.files[0],
-    });
-  };
-  // Handle form submission
   const handleSubmit = async (e) => {
-    console.log("submit clicked");
     e.preventDefault();
     const newErrors = {};
-    setErrors(newErrors);
 
     // Validate form fields
-    if (!formData.captions) {
+    if (!formData.captions.trim()) {
       newErrors.captions = "Captions, please";
     }
-    if (!formData.hashTag) {
+    if (!formData.hashTag.trim()) {
       newErrors.hashTag = "Hash Tag, please";
-    }
-    if (!formData.postImage) {
-      newErrors.postImage = "Post Image, please";
     }
 
     if (Object.keys(newErrors).length > 0) {
       setErrors(newErrors);
-      return; // Don't submit if there are validation errors
+      return;
     }
 
-    const data = new FormData();
-    data.append("captions", formData.captions);
-    data.append("hashTag", formData.hashTag);
-    data.append("postImage", formData.postImage);
+    const postData = {
+      id: data._id,
+      captions: formData.captions,
+      hashTag: formData.hashTag,
+    };
 
     try {
       const response = await axios.post(
-        "http://localhost:3000/api/post/post",
-        data,
+        "http://localhost:3000/api/post/update",
+        postData,
         {
-          headers: {
-            "Content-Type": "multipart/form-data",
-          },
           withCredentials: true,
         },
       );
 
+      console.log(response);
       if (response.data.success) {
         window.location.reload();
         close();
       }
-
-      // Handle response data accordingly
     } catch (error) {
-      console.error("Error creating post:", error);
+      console.error("Error updating post:", error);
     }
   };
 
@@ -86,7 +70,7 @@ export const NewPost = ({ close }) => {
     "mx-5 w-24 rounded border-2 border-neutral-300 px-4 py-2 text-violet-700 hover:bg-black hover:bg-violet-700 hover:text-white";
 
   return (
-    <div className="absolute left-1/2 top-1/2 flex w-96 -translate-x-1/2 -translate-y-1/2 rounded-xl bg-violet-700 bg-opacity-50 p-4 text-center">
+    <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 transform rounded-xl bg-violet-700 bg-opacity-50 p-4 text-center">
       <form className="w-full" onSubmit={handleSubmit}>
         <div className="mb-4">
           <textarea
@@ -118,30 +102,24 @@ export const NewPost = ({ close }) => {
           )}
         </div>
 
-        <div className="grid items-center gap-1.5">
-          <label className="text-sm font-medium leading-none text-white opacity-60 peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
-            Upload Image
-          </label>
-          <input
-            id="postImage"
-            name="postImage"
-            onChange={handleImageChange}
-            type="file"
-            className="border-input flex h-10 w-full rounded-md border border-neutral-300 bg-white px-3 py-2 text-sm text-gray-400 file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-gray-600 hover:border-violet-500 hover:bg-pallet1"
-          />
-          {errors.postImage && (
-            <p className="text-sm text-red-500">{errors.postImage}</p>
-          )}
-        </div>
         <div className="flex justify-center pt-8 text-center">
           <div onClick={close} className={buttonClass}>
             Close
           </div>
-          <div>
-            <button type="submit" className={buttonClass}>
-              Post
-            </button>
-          </div>
+          {!edit && (
+            <div>
+              <button type="submit" className={buttonClass}>
+                Post
+              </button>
+            </div>
+          )}
+          {edit && (
+            <div>
+              <button type="submit" className={buttonClass}>
+                Update
+              </button>
+            </div>
+          )}
         </div>
       </form>
     </div>
